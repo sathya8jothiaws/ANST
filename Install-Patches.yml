@@ -20,16 +20,17 @@
       category_names: "{{ win_updates_categories }}"
     register: update_count
     ignore_errors: yes
-  
-  - name: Pause for 6 minutes to build app cache
-    pause:
-    minutes: 6
 
   - name: Reboot if needed
     win_shell: Restart-Computer -Force
     when: update_count.reboot_required
     ignore_errors: yes
-
+  
+  - name: Sleep for 360 seconds and continue with play
+    wait_for:
+    timeout: 360
+    delegate_to: localhost
+  
   - name: Install missing updates.
     win_updates:
       category_names: "{{ win_updates_categories }}"
