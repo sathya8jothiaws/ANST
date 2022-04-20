@@ -1,32 +1,33 @@
---- 
+---
+# file: Install-Patches.yml
+
 - hosts: all
-  any_errors_fatal: false
   vars:
     win_updates_categories:
       - CriticalUpdates
       - SecurityUpdates
-
   tasks:
-    - name: "Check for missing patches"
-      register: update_count
-      win_updates:
-        category_names: "{{ win_updates_categories }}"
-        state: searched
-      ignore_errors: yes
+  # Check if there are missing updates
+  - name: Check for missing updates.
+    win_updates:
+      state: searched
+      category_names: "{{ win_updates_categories }}"
+    register: update_count
+    ignore_errors: yes
 
-    - name: "Reboot if needed"
-      win_reboot:
-        when: update_count.reboot_required
-      reboot_timeout: 120
-      ignore_errors: yes
+  - name: Reboot if needed
+    win_shell: Restart-Computer -Force
+    when: update_count.reboot_required
+    ignore_errors: yes
+    reboot_timeout: 120
 
-    - name: "Install missing updates."
-      register: update_result
-      win_updates:
-        category_names: "{{ win_updates_categories }}"
+  - name: Install missing updates.
+    win_updates:
+      category_names: "{{ win_updates_categories }}"
+    register: update_result
 
-    - name: "Reboot if needed after patching"
-      win_reboot:
-        when: update_result.reboot_required
-      reboot_timeout: 120
-      ignore_errors: yes
+  - name: Reboot if needed
+    win_shell: Restart-Computer -Force
+    when: update_result.reboot_required
+    ignore_errors: yes
+    reboot_timeout: 120
