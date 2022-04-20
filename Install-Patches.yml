@@ -15,9 +15,9 @@
       ignore_errors: yes
 
     - name: "Reboot if needed"
-      when: update_count.reboot_required
       win_reboot:
-         reboot_timeout: 120
+        when: update_count.reboot_required
+      reboot_timeout: 120
       ignore_errors: yes
 
     - name: "Install missing updates."
