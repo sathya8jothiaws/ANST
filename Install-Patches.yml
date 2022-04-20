@@ -2,8 +2,11 @@
 # file: windows-updates-all.yml
 
 - hosts: all
-  become: yes
-
+  become: true
+  become_user: system
+  become_method: runas
+  gather_facts: false
+  
   vars:
     win_updates_categories:
       - CriticalUpdates
