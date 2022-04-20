@@ -23,7 +23,9 @@
     ignore_errors: yes
 
   - name: Reboot if needed
-    win_shell: Restart-Computer -Force
+    win_reboot:
+      pre_reboot_delay:5
+      post_reboot_delay:300
     when: update_count.reboot_required
     ignore_errors: yes
 
