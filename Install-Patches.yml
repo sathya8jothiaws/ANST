@@ -20,6 +20,10 @@
       category_names: "{{ win_updates_categories }}"
     register: update_count
     ignore_errors: yes
+  
+  - name: Pause for 6 minutes to build app cache
+    pause:
+    minutes: 6
 
   - name: Reboot if needed
     win_shell: Restart-Computer -Force
