@@ -1,36 +1,40 @@
---- 
+---
+# file: windows-updates-all.yml
+
 - hosts: all
+  become: yes
   any_errors_fatal: false
+  serial:
+   - 1
+   - 5%
+   - 25%
   max_fail_percentage: 10%
-  serial: 
-    - 1
-    - 5%
-    - 25%
-  vars: 
-    win_updates_categories: 
+  vars:
+    win_updates_categories:
       - CriticalUpdates
       - SecurityUpdates
+  tasks:
+  # Check if there are missing updates
+  - name: Check for missing updates.
+    win_updates:
+      state: searched
+      category_names: "{{ win_updates_categories }}"
+    register: update_count
+    ignore_errors: yes
 
-  tasks: 
-    - name: "Check for missing updates."
-      register: update_count
-      win_updates: 
-        category_names: "{{ win_updates_categories }}"
-        state: searched
-      
-    - name: "Reboot if needed"
-      when: update_count.reboot_required
-      win_shell: "Restart-Computer -Force"
-      timeout: 300
-      wait_for_connection:
+  - name: Reboot if needed
+    win_shell: Restart-Computer -Force
+    when: update_count.reboot_required
+    ignore_errors: yes
+    wait_for_connection:
+    timeout: 320
 
-    - name: "Install missing updates."
-      register: update_result
-      win_updates: 
-        category_names: "{{ win_updates_categories }}"
+  - name: Install missing updates.
+    win_updates:
+      category_names: "{{ win_updates_categories }}"
+    register: update_result
 
-    - name: "Reboot if needed"
-      when: update_result.reboot_required
-      win_shell: "Restart-Computer -Force"
-      
-  
+  - name: Reboot if needed
+    win_shell: Restart-Computer -Force
+    when: update_result.reboot_required
+    ignore_errors: yes
