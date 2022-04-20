@@ -27,7 +27,12 @@
       post_reboot_delay: 300
     when: update_count.reboot_required
     ignore_errors: yes
-
+   
+  - name: Wait 15 Minutes, but only start checking after 1 minute.
+    wait_for_connection:
+      delay: 60
+      timeout: 840
+      
   - name: Install missing updates.
     win_updates:
       category_names: "{{ win_updates_categories }}"
