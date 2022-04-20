@@ -16,10 +16,11 @@
     ignore_errors: yes
 
   - name: Reboot if needed
-    win_shell: Restart-Computer -Force
-    when: update_count.reboot_required
-    ignore_errors: yes
-    reboot_timeout: 120
+    ansible:
+      windows:
+        win_reboot:
+          when: update_count.reboot_required
+            reboot_timeout: 120
 
   - name: Install missing updates.
     win_updates:
@@ -27,7 +28,8 @@
     register: update_result
 
   - name: Reboot if needed
-    win_shell: Restart-Computer -Force
-    when: update_result.reboot_required
-    ignore_errors: yes
-    reboot_timeout: 120
+    ansible:
+      windows:
+        win_reboot:
+          when: update_result.reboot_required
+            reboot_timeout: 120
