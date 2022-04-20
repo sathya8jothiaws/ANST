@@ -1,38 +1,36 @@
 --- 
-- 
+- hosts: all
   any_errors_fatal: false
-  hosts: all
   max_fail_percentage: 10%
   serial: 
     - 1
     - 5%
     - 25%
-  tasks: 
-    - 
-      ignore_errors: true
-      name: "Check for missing updates."
-      register: update_count
-      win_updates: 
-        category_names: "{{ win_updates_categories }}"
-        state: searched
-    - 
-      ignore_errors: true
-      name: "Reboot if needed"
-      timeout: 300
-      wait_for_connection: ~
-      when: update_count.reboot_required
-      win_shell: "Restart-Computer -Force"
-    - 
-      name: "Install missing updates."
-      register: update_result
-      win_updates: 
-        category_names: "{{ win_updates_categories }}"
-    - 
-      ignore_errors: true
-      name: "Reboot if needed"
-      when: update_result.reboot_required
-      win_shell: "Restart-Computer -Force"
   vars: 
     win_updates_categories: 
       - CriticalUpdates
       - SecurityUpdates
+
+  tasks: 
+    - name: "Check for missing updates."
+      register: update_count
+      win_updates: 
+        category_names: "{{ win_updates_categories }}"
+        state: searched
+      
+    - name: "Reboot if needed"
+      when: update_count.reboot_required
+      win_shell: "Restart-Computer -Force"
+      timeout: 300
+      wait_for_connection:
+
+    - name: "Install missing updates."
+      register: update_result
+      win_updates: 
+        category_names: "{{ win_updates_categories }}"
+
+    - name: "Reboot if needed"
+      when: update_result.reboot_required
+      win_shell: "Restart-Computer -Force"
+      
+  
