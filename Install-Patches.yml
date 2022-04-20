@@ -7,32 +7,32 @@
     - 1
     - 5%
     - 25%
+  vars:
+    win_updates_categories:
+      - CriticalUpdates
+      - SecurityUpdates
+
   tasks:
-    -
-      ignore_errors: true
+    - ignore_errors: true
       name: "Check for missing updates."
       register: update_count
       win_updates:
         category_names: "{{ win_updates_categories }}"
         state: searched
-    -
-      ignore_errors: true
+
+    - ignore_errors: true
       name: "Reboot if needed"
       when: update_count.reboot_required
       win_shell: "Restart-Computer -Force"
       wait_for_connection:
       timeout: 300
-    -
-      name: "Install missing updates."
+
+    - name: "Install missing updates."
       register: update_result
       win_updates:
         category_names: "{{ win_updates_categories }}"
-    -
-      ignore_errors: true
+
+    - ignore_errors: true
       name: "Reboot if needed"
       when: update_result.reboot_required
       win_shell: "Restart-Computer -Force"
-  vars:
-    win_updates_categories:
-      - CriticalUpdates
-      - SecurityUpdates
