@@ -20,10 +20,8 @@
       name: "Reboot if needed"
       when: update_count.reboot_required
       win_shell: "Restart-Computer -Force"
-    -
-    - name: Wait for system to become reachable over WinRM
       wait_for_connection:
-      timeout: 900
+      timeout: 300
     -
       name: "Install missing updates."
       register: update_result
