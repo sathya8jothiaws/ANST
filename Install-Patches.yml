@@ -33,8 +33,10 @@
     win_updates:
       category_names: "{{ win_updates_categories }}"
     register: update_result
+    retries: 3
 
   - name: Reboot if needed
     win_shell: Restart-Computer -Force
     when: update_result.reboot_required
     ignore_errors: yes
+    
