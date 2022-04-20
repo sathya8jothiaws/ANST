@@ -25,13 +25,12 @@
     win_shell: Restart-Computer -Force
     when: update_count.reboot_required
     ignore_errors: yes
-  
+    
   - name: Sleep for 360 seconds and continue with play
     wait_for:
-    timeout: 360
-    delegate_to: localhost
-  
-  - name: Install missing updates.
+      timeout: 360
+    
+    - name: Install missing updates.
     win_updates:
       category_names: "{{ win_updates_categories }}"
     register: update_result
