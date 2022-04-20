@@ -25,7 +25,7 @@
       win_updates:
         category_names: "{{ win_updates_categories }}"
 
-    - name: "Reboot if needed"
+    - name: "Reboot if needed after patching"
       win_reboot:
         when: update_result.reboot_required
       reboot_timeout: 120
