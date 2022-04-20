@@ -22,7 +22,7 @@
     register: update_count
     ignore_errors: yes
 
-  - name: Reboot if needed
+  - name: Reboot if needed.
     win_shell: Restart-Computer -Force
     when: update_count.reboot_required
     ignore_errors: yes
