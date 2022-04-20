@@ -1,41 +1,40 @@
----
-# file: windows-updates-all.yml
-
-- hosts: all
+--- 
+- 
   any_errors_fatal: false
-  serial:
-   - 1
-   - 5%
-   - 25%
+  hosts: all
   max_fail_percentage: 10%
-  vars:
-    win_updates_categories:
+  serial: 
+    - 1
+    - 5%
+    - 25%
+  tasks: 
+    - 
+      ignore_errors: true
+      name: "Check for missing updates."
+      register: update_count
+      win_updates: 
+        category_names: "{{ win_updates_categories }}"
+        state: searched
+    - 
+      ignore_errors: true
+      name: "Reboot if needed"
+      when: update_count.reboot_required
+      win_shell: "Restart-Computer -Force"
+    - 
+      name: "Sleep for 360 seconds"
+      wait_for: 
+        timeout: 360
+    - 
+      name: "Install missing updates."
+      register: update_result
+      win_updates: 
+        category_names: "{{ win_updates_categories }}"
+    - 
+      ignore_errors: true
+      name: "Reboot if needed"
+      when: update_result.reboot_required
+      win_shell: "Restart-Computer -Force"
+  vars: 
+    win_updates_categories: 
       - CriticalUpdates
       - SecurityUpdates
-  tasks:
-  # Check if there are missing updates
-  - name: Check for missing updates.
-    win_updates:
-      state: searched
-      category_names: "{{ win_updates_categories }}"
-    register: update_count
-    ignore_errors: yes
-
-  - name: Reboot if needed
-    win_shell: Restart-Computer -Force
-    when: update_count.reboot_required
-    ignore_errors: yes
-    
-  - name: Sleep for 360 seconds and continue with play
-    wait_for:
-      timeout: 360
-    
-    - name: Install missing updates.
-    win_updates:
-      category_names: "{{ win_updates_categories }}"
-    register: update_result
-
-  - name: Reboot if needed
-    win_shell: Restart-Computer -Force
-    when: update_result.reboot_required
-    ignore_errors: yes
