@@ -5,6 +5,7 @@
   become: true
   become_user: system
   become_method: runas
+  strategy: free
   gather_facts: false
   
   vars:
