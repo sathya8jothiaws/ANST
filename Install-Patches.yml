@@ -1,40 +1,40 @@
---- 
-- 
+---
+-
   any_errors_fatal: false
   hosts: all
   max_fail_percentage: 10%
-  serial: 
+  serial:
     - 1
     - 5%
     - 25%
-  tasks: 
-    - 
+  tasks:
+    -
       ignore_errors: true
       name: "Check for missing updates."
       register: update_count
-      win_updates: 
+      win_updates:
         category_names: "{{ win_updates_categories }}"
         state: searched
-    - 
+    -
       ignore_errors: true
       name: "Reboot if needed"
       when: update_count.reboot_required
       win_shell: "Restart-Computer -Force"
-    - 
-      name: "Sleep for 360 seconds"
-      wait_for: 
-        timeout: 360
-    - 
+    -
+    - name: Wait for system to become reachable over WinRM
+      wait_for_connection:
+      timeout: 900
+    -
       name: "Install missing updates."
       register: update_result
-      win_updates: 
+      win_updates:
         category_names: "{{ win_updates_categories }}"
-    - 
+    -
       ignore_errors: true
       name: "Reboot if needed"
       when: update_result.reboot_required
       win_shell: "Restart-Computer -Force"
-  vars: 
-    win_updates_categories: 
+  vars:
+    win_updates_categories:
       - CriticalUpdates
       - SecurityUpdates
