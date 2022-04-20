@@ -27,7 +27,7 @@
     when: update_count.reboot_required
     ignore_errors: yes
     wait_for_connection:
-    timeout: 320
+      timeout: 320
 
   - name: Install missing updates.
     win_updates:
