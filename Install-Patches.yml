@@ -1,0 +1,34 @@
+--- 
+- 
+  any_errors_fatal: false
+  hosts: all
+  tasks: 
+    - 
+      ignore_errors: true
+      name: "Check for missing patches"
+      register: update_count
+      win_updates: 
+        category_names: "{{ win_updates_categories }}"
+        state: searched
+    - 
+      ignore_errors: true
+      name: "Reboot if needed"
+      reboot_timeout: 120
+      when: update_count.reboot_required
+      win_reboot: ~
+    - 
+      name: "Install missing updates."
+      register: update_result
+      win_updates: 
+        category_names: "{{ win_updates_categories }}"
+    - 
+      ignore_errors: true
+      name: "Reboot if needed"
+      reboot_timeout: 120
+      when: update_result.reboot_required
+      win_reboot: ~
+  vars: 
+    win_updates_categories: 
+      - CriticalUpdates
+      - SecurityUpdates
+...
