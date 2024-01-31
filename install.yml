@@ -4,6 +4,4 @@
  
   tasks:
     - name: Install MSI
-      win_package: 
-        path: C:\temp\httpd-2.2.25-win32-x86-no_ssl.msi
-        state: present
+      win_command:C:\temp\setub.bat 1
